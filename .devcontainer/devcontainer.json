@@ -1,6 +1,6 @@
 {
   "name": "demo-python-openllmetry",
-  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "build": { "dockerfile": "Dockerfile" },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
