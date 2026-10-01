@@ -1,0 +1,39 @@
+# OpenTelemetry Collector (distribución de Dynatrace):
+# recibe OTLP de la app y lo envía a Dynatrace por su API OTLP.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  # Dynatrace solo acepta métricas en temporalidad delta
+  cumulative_to_delta: {}
+  batch:
+    timeout: 2s
+
+exporters:
+  otlp_http/dynatrace:
+    endpoint: ${env:DT_TENANT_URL}/api/v2/otlp
+    headers:
+      Authorization: "Api-Token ${env:DT_API_TOKEN}"
+  # Resumen de lo recibido en los logs del collector (docker compose logs otel-collector)
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_http/dynatrace, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [cumulative_to_delta, batch]
+      exporters: [otlp_http/dynatrace, debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_http/dynatrace, debug]

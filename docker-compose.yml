@@ -1,0 +1,31 @@
+name: demo-python-openllmetry
+
+services:
+  # --- Collector: recibe OTLP de la app y lo exporta a Dynatrace ---
+  otel-collector:
+    image: ghcr.io/dynatrace/dynatrace-otel-collector/dynatrace-otel-collector:0.57.0
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    environment:
+      - DT_TENANT_URL=${DT_TENANT_URL:?Falta DT_TENANT_URL}
+      - DT_API_TOKEN=${DT_API_TOKEN:?Falta DT_API_TOKEN}
+
+  # --- App: Flask + OpenAI instrumentada con OpenLLMetry ---
+  app:
+    build: .
+    container_name: app
+    ports:
+      - "8000:8000"   # web con el botón "Generar tráfico"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:?Falta OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4.1-nano}
+      - INTERVAL_SECONDS=${INTERVAL_SECONDS:-60}
+      - OTEL_SERVICE_NAME=demo-python-openllmetry
+      - TRACELOOP_BASE_URL=http://otel-collector:4318
+      - TRACELOOP_LOGGING_ENABLED=true
+      - TRACELOOP_TELEMETRY=false
+      - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
+    depends_on:
+      - otel-collector
