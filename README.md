@@ -13,7 +13,7 @@ Solo necesitas 3 valores, que se pasan como variables de entorno:
 |---|---|---|
 | `OPENAI_API_KEY` | API key de OpenAI (`sk-...`) | app |
 | `DT_TENANT_URL` | URL de tu tenant Dynatrace | collector |
-| `DT_API_TOKEN` | Access token de Dynatrace (`dt0c01...`) | collector |
+| `DT_API_TOKEN` | Platform token de Dynatrace (`dt0s16...`) | collector |
 
 ![Pasos](docs/pasos.drawio.png)
 
@@ -39,21 +39,28 @@ Si usas Dynatrace Managed, el formato es `https://<tu-dominio>/e/<id-del-entorno
 
 👉 Este valor es tu `DT_TENANT_URL`.
 
-## Paso 3. Crea el token de Dynatrace
+## Paso 3. Crea el token de Dynatrace (platform token)
 
-1. En Dynatrace presiona `Ctrl + K`, busca **Access Tokens** y ábrela.
-2. Haz clic en **Generate new token** y ponle un nombre (ej. `demo-openllmetry`).
-3. En **Scopes**, busca y marca estos 3:
+1. Entra a <https://myaccount.dynatrace.com/platformTokens> (**Account Management → My platform tokens**).
+2. Crea un token nuevo y completa:
+   - **Name**: `demo-openllmetry`
+   - **Expiration**: la que quieras
+   - **Environment**: tu tenant (el del paso 2)
+3. En **Scopes**, agrega estos 3:
 
-   | Scope en la UI | Nombre técnico |
+   | Scope | Para qué |
    |---|---|
-   | Ingest OpenTelemetry traces | `openTelemetryTrace.ingest` |
-   | Ingest metrics | `metrics.ingest` |
-   | Ingest logs | `logs.ingest` |
+   | `openpipeline:traces:ingest` | Trazas |
+   | `openpipeline:metrics:ingest` | Métricas |
+   | `openpipeline:logs:ingest` | Logs |
 
-4. Haz clic en **Generate token** y copia el token (empieza con `dt0c01.`). **Solo se muestra una vez.**
+4. Haz clic en **Generate** y copia el token (empieza con `dt0s16.`). **Solo se muestra una vez.**
 
-> Tiene que ser un **Access token** (API token clásico). Un *platform token* (`dt0s16.`) no sirve aquí.
+> El token solo puede hacer lo que tu usuario tiene permitido. Si tu usuario no tiene permiso de
+> ingesta en ese entorno, Dynatrace responderá `403`: pide a un admin ese permiso o un token de un *service user*.
+>
+> ¿Tienes un access token clásico (`dt0c01.`)? También sirve, con los scopes `openTelemetryTrace.ingest`,
+> `metrics.ingest` y `logs.ingest`. `start.sh` detecta solo qué tipo de token es.
 
 👉 Este valor es tu `DT_API_TOKEN`.
 
@@ -123,5 +130,5 @@ docker compose down
 | `start.sh` dice `ERROR: falta la variable ...` | Revisa el paso 4 y reinicia el codespace |
 | El botón muestra error `401` | La `OPENAI_API_KEY` está mal copiada |
 | El botón muestra error `429` | La cuenta de OpenAI no tiene saldo |
-| `docker compose logs otel-collector` muestra `401` o `403` | Token de Dynatrace incorrecto o le falta un scope (paso 3) |
+| `docker compose logs otel-collector` muestra `401` o `403` | Token de Dynatrace incorrecto, le falta un scope o tu usuario no tiene permiso de ingesta (paso 3) |
 | `docker compose logs otel-collector` muestra `404` | La URL del tenant está mal (paso 2) |

@@ -13,7 +13,7 @@
       "description": "URL del tenant Dynatrace, ej. https://abc12345.live.dynatrace.com"
     },
     "DT_API_TOKEN": {
-      "description": "Access token de Dynatrace (dt0c01...) con scopes openTelemetryTrace.ingest, metrics.ingest y logs.ingest"
+      "description": "Platform token de Dynatrace (dt0s16...) con scopes openpipeline:traces:ingest, openpipeline:metrics:ingest y openpipeline:logs:ingest (también sirve un access token dt0c01...)"
     },
     "OPENAI_API_KEY": {
       "description": "API key de OpenAI (sk-...)"
