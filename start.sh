@@ -10,7 +10,7 @@ fi
 
 for v in DT_TENANT_URL DT_API_TOKEN OPENAI_API_KEY; do
   if [ -z "${!v}" ]; then
-    echo "ERROR: falta la variable $v. Revisa la sección 2 del README."
+    echo "ERROR: falta la variable $v. Revisa el paso 4 del README."
     exit 1
   fi
 done
