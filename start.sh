@@ -21,7 +21,14 @@ DT_TENANT_URL="${DT_TENANT_URL/.sprint.apps./.sprint.}"
 DT_TENANT_URL="${DT_TENANT_URL/.apps./.live.}"
 export DT_TENANT_URL
 
-echo "Enviando telemetría a: ${DT_TENANT_URL}/api/v2/otlp"
+# Platform token (dt0s16.) va con "Bearer"; access token clásico (dt0c01.) con "Api-Token"
+case "$DT_API_TOKEN" in
+  dt0c01.*) DT_AUTH_SCHEME="Api-Token" ;;
+  *)        DT_AUTH_SCHEME="Bearer" ;;
+esac
+export DT_AUTH_SCHEME
+
+echo "Enviando telemetría a: ${DT_TENANT_URL}/api/v2/otlp (Authorization: ${DT_AUTH_SCHEME})"
 docker compose up --build -d
 
 if [ -n "$CODESPACE_NAME" ]; then
