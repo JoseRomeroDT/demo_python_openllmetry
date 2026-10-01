@@ -1,0 +1,23 @@
+{
+  "name": "demo-python-openllmetry",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "Demo OpenLLMetry", "onAutoForward": "openBrowser" }
+  },
+  "secrets": {
+    "DT_TENANT_URL": {
+      "description": "URL del tenant Dynatrace, ej. https://abc12345.live.dynatrace.com"
+    },
+    "DT_API_TOKEN": {
+      "description": "Access token de Dynatrace (dt0c01...) con scopes openTelemetryTrace.ingest, metrics.ingest y logs.ingest"
+    },
+    "OPENAI_API_KEY": {
+      "description": "API key de OpenAI (sk-...)"
+    }
+  },
+  "postCreateCommand": "chmod +x start.sh && docker --version && docker compose version"
+}
